@@ -1,3 +1,5 @@
+using AddressBook.DataAccessLayer;
+
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services, builder.Configuration);
 
@@ -11,6 +13,9 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     services.AddControllers();
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+
+    services.AddSqlServer<DataContext>(configuration.GetConnectionString("SqlConnection"));
+    services.AddScoped<IDataContext>(services => services.GetRequiredService<DataContext>());
 }
 
 void Configure(IApplicationBuilder app, IWebHostEnvironment environment, IServiceProvider services)
