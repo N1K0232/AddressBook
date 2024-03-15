@@ -1,6 +1,14 @@
+using System.Text.Json.Serialization;
+using AddressBook.BusinessLayer.MapperProfiles;
+using AddressBook.BusinessLayer.Services;
+using AddressBook.BusinessLayer.Services.Interfaces;
 using AddressBook.BusinessLayer.Settings;
+using AddressBook.BusinessLayer.Validations;
 using AddressBook.DataAccessLayer;
 using AddressBook.StorageProviders.Extensions;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using OperationResults.AspNetCore;
 using TinyHelpers.AspNetCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +27,28 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     services.AddMemoryCache();
     services.AddRequestLocalization(appSettings.SupportedCultures);
 
-    services.AddControllers();
+    services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+
+    services.AddAutoMapper(typeof(PersonMapperProfile).Assembly);
+    services.AddValidatorsFromAssemblyContaining<SavePersonRequestValidator>();
+
+    services.AddFluentValidationAutoValidation(options =>
+    {
+        options.DisableDataAnnotationsValidation = true;
+    });
+
+    services.AddOperationResult(options =>
+    {
+        options.ErrorResponseFormat = ErrorResponseFormat.List;
+    });
 
     services.AddSqlServer<DataContext>(configuration.GetConnectionString("SqlConnection"));
     services.AddScoped<IDataContext>(services => services.GetRequiredService<DataContext>());
@@ -42,11 +69,14 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
             options.ContainerName = appSettings.ContainerName;
         });
     }
+
+    services.AddScoped<IPeopleService, PeopleService>();
 }
 
 void Configure(IApplicationBuilder app, IWebHostEnvironment environment, IServiceProvider services)
 {
     app.UseHttpsRedirection();
+    app.UseRequestLocalization();
 
     if (environment.IsDevelopment())
     {

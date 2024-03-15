@@ -6,5 +6,5 @@ public class ListResult<T>
 
     public int TotalCount { get; init; }
 
-    public int HasNextPage { get; init; }
+    public bool HasNextPage { get; init; }
 }
