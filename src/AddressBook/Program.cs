@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using AddressBook.BusinessLayer.Settings;
+using AddressBook.DataAccessLayer;
 using AddressBook.Extensions;
 using AddressBook.Swagger;
 using MinimalHelpers.Routing;
@@ -26,7 +27,6 @@ if (swagger.IsEnabled)
 {
     builder.Services.AddOpenApi(options =>
     {
-        options.RemoveServerList();
         options.AddAcceptLanguageHeader();
         options.AddDefaultProblemDetailsResponse();
     });
@@ -50,6 +50,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+builder.Services.AddSqlServer<DataContext>(builder.Configuration.GetConnectionString("SqlConnection"));
+builder.Services.AddScoped<IDataContext>(services => services.GetRequiredService<DataContext>());
 
 var app = builder.Build();
 app.Environment.ApplicationName = settings.ApplicationName;
