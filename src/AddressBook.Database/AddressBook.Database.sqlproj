@@ -65,4 +65,7 @@
     <Build Include="dbo\Tables\Cities.sql" />
     <Build Include="dbo\Tables\People.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="AddressBook.Database.publish.xml" />
+  </ItemGroup>
 </Project>
