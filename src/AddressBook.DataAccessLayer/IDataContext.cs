@@ -9,4 +9,6 @@ public interface IDataContext
     IQueryable<T> GetData<T>(bool trackingChanges = false) where T : BaseEntity;
 
     Task InsertAsync<T>(T entity, CancellationToken cancellationToken = default) where T : BaseEntity;
+
+    Task UpdateAsync<T>(T entity, CancellationToken cancellationToken = default) where T : BaseEntity;
 }

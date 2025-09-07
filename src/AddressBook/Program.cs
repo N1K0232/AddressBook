@@ -1,4 +1,7 @@
 using System.Text.Json.Serialization;
+using AddressBook.BusinessLayer.Mapping;
+using AddressBook.BusinessLayer.Services;
+using AddressBook.BusinessLayer.Services.Interfaces;
 using AddressBook.BusinessLayer.Settings;
 using AddressBook.DataAccessLayer;
 using AddressBook.Extensions;
@@ -53,6 +56,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.Services.AddSqlServer<DataContext>(builder.Configuration.GetConnectionString("SqlConnection"));
 builder.Services.AddScoped<IDataContext>(services => services.GetRequiredService<DataContext>());
+
+builder.Services.AddAutomapper(typeof(PersonMapperProfile));
+
+builder.Services.AddScoped<IPeopleService, PeopleService>();
+builder.Services.AddScoped<ICityService, CityService>();
 
 var app = builder.Build();
 app.Environment.ApplicationName = settings.ApplicationName;
